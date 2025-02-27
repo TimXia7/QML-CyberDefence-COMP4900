@@ -20,6 +20,7 @@ requests==2.32.3
 rustworkx==0.16.0
 scipy==1.15.2
 scipy-openblas32==0.3.29.0.0
+setuptools==65.5.0
 six==1.17.0
 termcolor==2.5.0
 tomlkit==0.13.2

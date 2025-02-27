@@ -6,6 +6,6 @@
 ```
 pip install virtualenv
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate or .\venv\Scripts\Activate.ps1 for windows
 pip install -r requirements.txt
 ```
