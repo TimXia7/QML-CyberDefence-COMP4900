@@ -59,7 +59,7 @@ def calculate_distance(train1, train2, track):
     return distance
 
 # Start the movement of the trains until train1 gets back to node 0
-# IMPORTANT: parameter, train1_decision_func, determines if train1 takes the loop or not, 
+# IMPORTANT: parameter, take_bypass, determines if train1 takes the loop or not, 
 # function returns the distance between the 2 trains after the loop
 def simulate_train_loop(train1, train2, track, take_bypass):
     start_position = train1.current_node.position
@@ -90,7 +90,7 @@ def rand_bool():
 
 
 
-# Start of main method for testing, can be removed later:
+# Start of main method for testing, when you are testing with other files, make sure to either comment anything below out, or don't directly run this file.
 
 track = Track()
 train1 = Train(track, start_position=0)
