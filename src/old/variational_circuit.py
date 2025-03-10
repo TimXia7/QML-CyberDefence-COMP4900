@@ -12,8 +12,8 @@ dev = qml.device("default.qubit", wires=1)
 # These should vary based on the ML portion
 # Note, they can be both decimals or a more percise value via math libraries
 # theta_x is pi/2, theta_y is pi/4 (example values)
-# theta_x = np.pi / 4
-# theta_y = 0.78539816339
+theta_x = np.pi / 2 
+theta_y = np.pi / 2
 
 # Define quantum device "dev." To my knowledge, this is just PennyLane syntax. 
 # This function that will run the circuit from before.
@@ -27,4 +27,4 @@ def variational_circuit(theta_x, theta_y):
 # "circuit(theta_x, theta_y)" contains the result of the circuit, the chance to take the pass or not
 # e.g. 1.0 means gurantee to take pass, 0.0 gurantee to take loop, 0.5 means even chance
 # uncomment the line below if you want to test within this file
-# print(variational_circuit(theta_x, theta_y))
+print(variational_circuit(theta_x, theta_y))

@@ -65,11 +65,11 @@ def simulate_train_loop(train1, train2, track, take_bypass):
     start_position = train1.current_node.position
     while True:
 
-        if (train1.current_node.position == 2 ):
-            if (take_bypass):
-                print("The agent decided to take the bypass!")
-            else:
-                print("The agent decided to take the loop!")
+        # if (train1.current_node.position == 2 ):
+        #     if (take_bypass):
+        #         print("The agent decided to take the bypass!")
+        #     else:
+        #         print("The agent decided to take the loop!")
 
         train1.move(take_bypass)
         train2.move(False)  
@@ -78,39 +78,3 @@ def simulate_train_loop(train1, train2, track, take_bypass):
             break
 
     return calculate_distance(train1, train2, track)
-
-
-# Randomly returns true or false
-# This is because right now, train1 chooses to take the bypass randomly
-def rand_bool():
-    return random.random() < 0.5  
-
-
-
-
-
-
-# Start of main method for testing, when you are testing with other files, make sure to either comment anything below out, or don't directly run this file.
-
-track = Track()
-train1 = Train(track, start_position=0)
-train2 = Train(track, start_position=7)
-
-# 10 loops for testing
-previous_distance = None 
-for loop in range(1, 11): 
-    distance = simulate_train_loop(train1, train2, track, rand_bool())
-    
-    # Calculate difference from previous loop
-    if (loop != 1):
-        difference = distance - previous_distance
-    else:
-        difference = "N/A"
-    
-    # Print results
-    print(f"LOOP {loop}: Final distance = {distance}, Difference from last loop = {difference}")
-    print(f"Agent's position:     {train1.current_node.position}")
-    print(f"Adversary's position: {train2.current_node.position} \n")
-    
-    # Update previous distance for next iteration
-    previous_distance = distance
