@@ -44,37 +44,48 @@ def update(theta, p):
 
 # Q-Learning values
 theta = np.random.randn(2)  # Initialize circuit parameters randomly
-epochs = 100                # Training iterations (see main loop below)
+epochs = 100               # Training iterations (see main loop below)
 M = np.zeros(epochs)        # Stores probability of ket 0. This is used later to graph everything
 Q = [0, 0]                  # Q-values for actions (loop, bypass)
-alpha = 0.01                # Learning rate (similar to stepsize, but it is Q-Learning specific)
+alpha = 0.1                # Learning rate (similar to stepsize, but it is Q-Learning specific)
+gamma = 0.95                # Discount factor for future rewards
+epsilon = 0.1
 
 # Main Training Loop
 track = Track()
 train1 = Train(track, start_position=0)
 train2 = Train(track, start_position=7)
+distances = np.zeros(epochs)
+
+previous_distance = simulate_train_loop(train1, train2, track, np.random.randint(2))
 
 for i in range(epochs):
-    # Randomly select True or false to take bypass (stored in, take_bypass)
-    a = np.random.randint(2)
+    if np.random.rand() < epsilon:
+        a = np.random.randint(2)
+    else:
+        a = np.argmax(Q)
+
     take_bypass = a == 1
 
     # Determine reward (simulate_train_loop returns the distance between the trains)
-    reward = simulate_train_loop(train1, train2, track, take_bypass)
+    current_distance = simulate_train_loop(train1, train2, track, take_bypass)
+    distances[i] = current_distance
 
-    # Normalize reward to a value between 0-1
-        # Does this have to be a unit vector? idk
-    max_possible_distance = 6 
-    normalized_reward = reward / max_possible_distance
+    if current_distance > previous_distance:
+        reward = +1
+    elif current_distance < previous_distance:
+        reward = -1
+    else:
+        reward = 0 
 
     # Update Q-values using Bellman equation (I learned this from the prof's code)
     # to my knowledge, this is just part of the Q-learning process
     # Not in the code in twotrainexample.ipynb though, so I'm looking more into this
-    Q[a] = (1 - alpha) * Q[a] + alpha * (normalized_reward + Q[a])
+    Q[a] = Q[a] + alpha * (reward + gamma * max(Q) - Q[a])
 
     # Train the system based on Q-values using update()
     # Similar to prof's code
-    if (Q[0] + Q[1]) > 0:
+    if abs(Q[0]) + abs(Q[1]) > 0:
         theta = update(theta, Q[0] / (Q[0] + Q[1]))
 
     # Store probability of choosing loop to graph later
@@ -88,4 +99,21 @@ plt.xlabel('Epoch')
 plt.ylabel('Probability')
 plt.grid(True)
 plt.legend()
+plt.show()
+plt.savefig('plot.png')  # Save as PNG
+
+
+plt.figure()
+plt.plot(distances, 'ro-', label='Distance Between Trains')
+
+window = 10
+avg_distances = np.convolve(distances, np.ones(window)/window, mode='valid')
+plt.plot(range(window - 1, epochs), avg_distances, 'b-', label=f'{window}-Epoch Average')
+
+plt.xlabel('Epoch')
+plt.ylabel('Distance')
+plt.title('Distance Between Trains Over Time')
+plt.grid(True)
+plt.legend()
+plt.savefig('distance_plot.png')
 plt.show()
