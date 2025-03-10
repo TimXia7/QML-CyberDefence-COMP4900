@@ -1,5 +1,6 @@
 
 import random
+from collections import deque
 
 # All classes for the simulation are in this one file for simplicity. This is because, a. it's not very complex
 # and b. it'll act as a black box for the other, more complex portions of the project
@@ -14,6 +15,15 @@ class Node:
         self.position = position
         self.next = None  
         self.bypass = None  
+
+    @property
+    def neighbors(self):
+        neighbors = []
+        if self.next:
+            neighbors.append(self.next)
+        if self.bypass:
+            neighbors.append(self.bypass)
+        return neighbors
 
 class Track:
     def __init__(self):
@@ -48,15 +58,26 @@ class Train:
         else:
             self.current_node = self.current_node.next
 
-# Calculate the distance between the 2 trains in a similar way to the paper
-# note: Since train 2 always takes the loop, distance is calculated this way
+
 def calculate_distance(train1, train2, track):
-    distance = 0
-    current = train2.current_node
-    while current != train1.current_node:
-        current = current.next  
-        distance += 1
-    return distance
+    # BFS for shortest path calculation
+    queue = deque([(train2.current_node, 0)])
+    visited = set()
+    
+    while queue:
+        node, distance = queue.popleft()
+        
+        if node == train1.current_node:
+            return distance
+        
+        if node not in visited:
+            visited.add(node)
+            for neighbor in node.neighbors:
+                if neighbor not in visited:
+                    queue.append((neighbor, distance + 1))
+
+    return float('inf')
+
 
 # Start the movement of the trains until train1 gets back to node 0
 # IMPORTANT: parameter, take_bypass, determines if train1 takes the loop or not, 
