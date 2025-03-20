@@ -75,10 +75,13 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
     for i in range(epochs):
         if np.random.rand() < epsilon:
             a_train1 = np.random.randint(2)
+            a_train2 = np.random.randint(2)
         else:
             a_train1 = np.argmax(train1_Q)
+            a_train2 = np.argmax(train2_Q)
         
         take_bypass_train1 = a_train1 == 1
+        take_bypass_train2 = a_train2 == 1
 
         
 
@@ -91,6 +94,27 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             
             take_bypass_train2 = a_train2 == 1
             current_distance = simulate_train_loop_qrl(train1, train2, track, take_bypass_train1, take_bypass_train2)
+            distances[i] = current_distance
+
+            if current_distance > previous_distance:
+                train2_reward = -1
+            elif current_distance < previous_distance:
+                train2_reward = +1
+            else:
+                train2_reward = 0
+
+            # Update Q-values using Bellman equation
+            train2_Q[a_train2] = train2_Q[a_train2] + alpha * (train2_reward + gamma * max(train2_Q) - train2_Q[a_train2])
+            
+            # Calculate target probability based on Q-values
+            p_train2 = train2_Q[0] / (train2_Q[0] + train2_Q[1]) if (train2_Q[0] + train2_Q[1]) != 0 else 0.5
+            
+            # Train the quantum model using Q-values
+            if p_train2 > 0:
+                theta_train2 = update(theta_train2, p_train2)
+
+            # Store probability of choosing loop for plotting
+            A[i] = W(theta_train2)[0]
         
         elif mode == "Random":
             current_distance = simulate_train_loop_random(train1, train2, track, take_bypass_train1)
@@ -98,40 +122,27 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
         else:
             current_distance = simulate_train_loop_predictable(train1, train2, track, take_bypass_train1)
         
-        if mode != "QRL":
-            a_train2 = 0
-
-
-        
         distances[i] = current_distance
 
         if current_distance > previous_distance:
             train1_reward = +1
-            train2_reward = -1
         elif current_distance < previous_distance:
             train1_reward = -1
-            train2_reward = +1
         else:
             train1_reward = 0
-            train2_reward = 0
 
         # Update Q-values using Bellman equation
         train1_Q[a_train1] = train1_Q[a_train1] + alpha * (train1_reward + gamma * max(train1_Q) - train1_Q[a_train1])
-        train2_Q[a_train2] = train2_Q[a_train2] + alpha * (train2_reward + gamma * max(train2_Q) - train2_Q[a_train2])
         
         # Calculate target probability based on Q-values
         p_train1 = train1_Q[0] / (train1_Q[0] + train1_Q[1]) if (train1_Q[0] + train1_Q[1]) != 0 else 0.5
-        p_train2 = train2_Q[0] / (train2_Q[0] + train2_Q[1]) if (train2_Q[0] + train2_Q[1]) != 0 else 0.5
         
         # Train the quantum model using Q-values
         if p_train1 > 0:
             theta_train1 = update(theta_train1, p_train1)
-        if p_train2 > 0:
-            theta_train2 = update(theta_train2, p_train2)
 
         # Store probability of choosing loop for plotting
         M[i] = W(theta_train1)[0]
-        A[i] = W(theta_train2)[0]
 
     # Save results for this parameter set
     results.append({
@@ -151,17 +162,16 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 import pandas as pd
 
 df = pd.DataFrame(results)
-print(df)
 
-# Plot mean probability of taking loop for different epsilons
+# ✅ Plot mean probability of taking loop over epochs for different epsilons
 plt.figure(figsize=(10, 6))
-for epsilon in epsilon_values:
-    subset = df[df['epsilon'] == epsilon]
-    plt.plot(subset['alpha'], subset['mean_probability_train1'], label=f'Train 1 - epsilon={epsilon}', marker='o')
-    plt.plot(subset['alpha'], subset['mean_probability_train2'], label=f'Train 2 - epsilon={epsilon}', marker='x')
 
-plt.title('Mean Probability of Taking Loop vs Alpha for Different Epsilons')
-plt.xlabel('Alpha')
+# Plot the mean probabilities at each epoch for both trains
+plt.plot(range(epochs), M, label=f'Train 1 - epsilon={epsilon_values[0]}', marker='o', markersize=3, linestyle='-')
+plt.plot(range(epochs), A, label=f'Train 2 - epsilon={epsilon_values[0]}', marker='x', markersize=3, linestyle='-')
+
+plt.title('Mean Probability of Taking Loop Over Epochs')
+plt.xlabel('Epochs')
 plt.ylabel('Mean Probability of Taking Loop')
 plt.legend()
 plt.grid(True)
@@ -173,11 +183,14 @@ plt.figure(figsize=(10, 6))
 window = 10
 avg_distances = np.convolve(distances, np.ones(window)/window, mode='valid')
 
-# Plot the rolling average
-plt.plot(range(window - 1, epochs), avg_distances, label='Average Distance', color='blue')
-plt.title('Average Distance Between Trains Over Time')
-plt.xlabel('Epoch')
+# Adjust x-axis to show epochs
+plt.plot(range(epochs - len(avg_distances) + 1, epochs + 1), avg_distances, label='Average Distance', color='blue')
+plt.title('Average Distance Between Trains Over Epochs')
+plt.xlabel('Epochs')
 plt.ylabel('Average Distance')
 plt.legend()
 plt.grid(True)
 plt.savefig('average_distance_plot.png')
+
+plt.show()
+
