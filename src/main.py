@@ -123,6 +123,8 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
         p_train1 = train1_Q[0] / (train1_Q[0] + train1_Q[1]) if (train1_Q[0] + train1_Q[1]) != 0 else 0.5
         p_train2 = train2_Q[0] / (train2_Q[0] + train2_Q[1]) if (train2_Q[0] + train2_Q[1]) != 0 else 0.5
         
+        print("p_train1: " + str(p_train1))
+
         # Train the quantum model using Q-values
         if p_train1 > 0:
             theta_train1 = update(theta_train1, p_train1)
@@ -181,3 +183,5 @@ plt.ylabel('Average Distance')
 plt.legend()
 plt.grid(True)
 plt.savefig('average_distance_plot.png')
+
+plt.show()

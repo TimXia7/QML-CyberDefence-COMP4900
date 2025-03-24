@@ -171,7 +171,7 @@ def simulate_train_loop_predictable(train1, train2, track, takeAlternateRoute):
     
     while True:
         train1.move(takeAlternateRoute)
-        train2.move(0)
+        train2.move(1)
 
         if train1.current_node.position == start_position:
             break
