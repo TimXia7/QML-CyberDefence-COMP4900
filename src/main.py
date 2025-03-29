@@ -81,9 +81,6 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             a_train2 = np.argmax(train2_Q)
         
         take_bypass_train1 = a_train1 == 1
-        take_bypass_train2 = a_train2 == 1
-
-        
 
         # Simulate train movement and get the reward
         if mode == "QRL":
