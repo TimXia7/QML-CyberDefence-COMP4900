@@ -51,13 +51,16 @@ gamma_values = [0.9]
 epsilon_values = [0.3]
 epoch_values = [100]
 results = []
+mode = "Random"
 
 for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_values, epsilon_values, epoch_values):
     print(f"Running with alpha={alpha}, gamma={gamma}, epsilon={epsilon}, epochs={epochs}")
 
     # Initialize Q-values and quantum model parameters
-    theta_train1 = np.random.randn(10)  
+    theta_train1 = np.random.randn(10) 
+    theta_train2 = np.random.randn(10)  
     train1_Q = [0, 0, 0]
+    train2_Q = [0, 0, 0]
     distances = np.zeros(epochs)
 
     # Store probabilities for graphs
@@ -65,6 +68,11 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
     M_bypass = np.zeros(epochs)    
     M_outerLoop = np.zeros(epochs) 
 
+    A_loop = np.zeros(epochs)
+    A_bypass = np.zeros(epochs)
+    A_outerLoop = np.zeros(epochs)
+
+    distances = np.zeros(epochs)
     # Initialize track and trains
     track = IntermediateTrack()
     train1 = Train(track, start_position=0)
@@ -81,6 +89,17 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             a_train1 = np.random.randint(0, 3)  # Randomly pick 0, 1, or 2
         else:
             a_train1 = np.argmax(train1_Q)  # Choose best action from Q-table
+            a_train2 = np.argmax(train2_Q)
+
+        
+        if mode == "QRL":
+            current_distance = simulate_train_loop_qrl(train1, train2, track, a_train1, a_train2)
+        elif mode == "Random":
+            current_distance = simulate_train_loop_random(train1, train2, track, a_train1)
+        else:
+            current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
+
+        
 
         # Simulate train movement and get reward
         current_distance = simulate_train_loop_random(train1, train2, track, a_train1)
@@ -93,6 +112,7 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             train1_reward = -1
         else:
             train1_reward = 0
+            train2_reward = 0
 
         # Update Q-values using Bellman's equation
         train1_Q[a_train1] = train1_Q[a_train1] + alpha * (train1_reward + gamma * max(train1_Q) - train1_Q[a_train1])
