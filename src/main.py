@@ -45,11 +45,7 @@ def update(theta, p):
 
 alpha_values = [0.1]
 gamma_values = [0.9]
-
-epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
-epsilon_end = 0.10   # Minimum exploration rate
-decay_rate = 0.995   # How fast epsilon decreases
-
+epsilon_values = [0.1]
 epoch_values = [100]
 
 results = []
@@ -123,7 +119,6 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
         else:
             current_distance = simulate_train_loop_predictable(train1, train2, track, take_bypass_train1)
         
-        epsilon = max(epsilon_end, epsilon * decay_rate)
         distances[i] = current_distance
 
         if current_distance > previous_distance:
