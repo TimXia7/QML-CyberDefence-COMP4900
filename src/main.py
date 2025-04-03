@@ -175,20 +175,21 @@ plt.xlabel('Epochs')
 plt.ylabel('Mean Probability of Taking Loop')
 plt.legend()
 plt.grid(True)
-plt.savefig('mean_probability_plot_basic.png')
+plt.savefig('mean_probability_plot.png')
 
+# ✅ Plot average distance over epochs
 plt.figure(figsize=(10, 6))
-plt.plot(range(epochs), distances, label='Distance', color='blue', alpha=0.6)
-
 # Calculate rolling average (window size = 10)
 window = 10
-avg_distances = np.convolve(distances, np.ones(window) / window, mode='valid')
-plt.plot(range(window - 1, epochs), avg_distances, label='Average Distance', color='red', linestyle='--')
+avg_distances = np.convolve(distances, np.ones(window)/window, mode='valid')
 
-plt.title('Distance Between Trains Over Epochs')
+# Adjust x-axis to show epochs
+plt.plot(range(epochs - len(avg_distances) + 1, epochs + 1), avg_distances, label='Average Distance', color='blue')
+plt.title('Average Distance Between Trains Over Epochs')
 plt.xlabel('Epochs')
-plt.ylabel('Distance')
+plt.ylabel('Average Distance')
 plt.legend()
 plt.grid(True)
-plt.savefig('distance_plot_basic.png')
+plt.savefig('average_distance_plot.png')
+
 plt.show()
