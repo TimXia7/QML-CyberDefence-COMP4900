@@ -48,7 +48,7 @@ def update(theta, p_target):
     for _ in range(100): 
         theta = opt.step(lambda v: cost(v, p_target), theta)
     return theta
-
+ 
 # Q-learning parameters
 alpha_values = [0.1]
 gamma_values = [0.9]
