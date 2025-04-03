@@ -43,9 +43,9 @@ def update(theta, p):
         theta = opt.step(lambda v: cost(v, p), theta)
     return theta
 
-alpha_values = [0.1]
-gamma_values = [0.9]
-epsilon_values = [0.1]
+alpha_values = [0.01,0.1]
+gamma_values = [0.99,0.95,0.9]
+epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epoch_values = [100]
 
 results = []
@@ -162,8 +162,11 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 import pandas as pd
 
 df = pd.DataFrame(results)
+df.to_csv("q_learning_results_simple.csv", index=False)
+print("Results saved to q_learning_results.csv")
 
-# ✅ Plot mean probability of taking loop over epochs for different epsilons
+
+
 plt.figure(figsize=(10, 6))
 
 # Plot the mean probabilities at each epoch for both trains
@@ -175,21 +178,25 @@ plt.xlabel('Epochs')
 plt.ylabel('Mean Probability of Taking Loop')
 plt.legend()
 plt.grid(True)
-plt.savefig('mean_probability_plot.png')
+plt.savefig('mean_probability_plot_simple.png')
 
-# ✅ Plot average distance over epochs
+# ✅ Plot distance over epochs with average line
 plt.figure(figsize=(10, 6))
+
+# Plot raw distances
+plt.plot(range(epochs), distances, label='Distance', color='blue', alpha=0.6)
+
 # Calculate rolling average (window size = 10)
 window = 10
-avg_distances = np.convolve(distances, np.ones(window)/window, mode='valid')
+avg_distances = np.convolve(distances, np.ones(window) / window, mode='valid')
 
-# Adjust x-axis to show epochs
-plt.plot(range(epochs - len(avg_distances) + 1, epochs + 1), avg_distances, label='Average Distance', color='blue')
-plt.title('Average Distance Between Trains Over Epochs')
+# Plot average distances with a dashed line
+plt.plot(range(window - 1, epochs), avg_distances, label='Average Distance', color='red', linestyle='--')
+
+plt.title('Distance Between Trains Over Epochs')
 plt.xlabel('Epochs')
-plt.ylabel('Average Distance')
+plt.ylabel('Distance')
 plt.legend()
 plt.grid(True)
-plt.savefig('average_distance_plot.png')
-
+plt.savefig('distance_plot_simple.png')
 plt.show()

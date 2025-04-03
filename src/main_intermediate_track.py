@@ -50,14 +50,14 @@ def update(theta, p_target):
     return theta
  
 # Q-learning parameters
-alpha_values = [0.1]
-gamma_values = [0.9]
+alpha_values = [0.01,0.1,0.2]
+gamma_values = [0.99,0.95,0.9]
 
 epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.10   # Minimum exploration rate
 decay_rate = 0.995   # How fast epsilon decreases
 
-epoch_values = [1000]
+epoch_values = [100]
 results = []
 mode = "QRL"
 
@@ -182,7 +182,11 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
         'mean_probability_train2_loop': np.mean(A_loop),
     })
 
+
 df = pd.DataFrame(results)
+df.to_csv("q_learning_results.csv", index=False)
+print("Results saved to q_learning_results.csv")
+
 print(df)
 
 plt.figure(figsize=(10, 6))
@@ -200,14 +204,14 @@ plt.grid(True)
 plt.savefig('loop_probability_plot.png')
 
 plt.figure(figsize=(10, 6))
+plt.plot(range(epochs), distances, label='Distance', color='blue', alpha=0.6)
 window = 10
 avg_distances = np.convolve(distances, np.ones(window)/window, mode='valid')
-plt.plot(range(window - 1, epochs), avg_distances, label='Avg Distance', color='blue')
-plt.title('Average Distance Over Epochs')
+plt.plot(range(window - 1, epochs), avg_distances, label='Average Distance', color='red', linestyle='--')
+plt.title('Distance Over Epochs')
 plt.xlabel('Epochs')
 plt.ylabel('Distance')
 plt.legend()
 plt.grid(True)
-plt.savefig('distance_over_time.png')
-
+plt.savefig('distance_plot.png')
 plt.show()
