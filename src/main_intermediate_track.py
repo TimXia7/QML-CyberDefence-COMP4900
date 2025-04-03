@@ -24,22 +24,26 @@ def VQC(theta):
     return qml.probs(wires=[0, 1])
 
 # Only keep 3 states out of the max of 4 with 2 qubits
+# Third state is probability of 3rd or 4th state, but since there is no 4th state, this function essentially ignores it
 def map_VQC_results(theta):
     probs = VQC(theta)
     return np.array([probs[0], probs[1], probs[2] + probs[3]])
 
-# Mean Squared Error Loss Function
+# Mean Squared Error Loss Function:
+# MSE instead of simple subtraction ensures that larger differences are punished significantly
 def square_loss(X, Y):
     return np.mean((X - Y) ** 2) 
 
-# Cost function
+# Cost function:
+# Caluclates the difference between the VQC output (first param of square_loss), and target probability distribution (p_target)
 def cost(theta, p_target):
     return square_loss(map_VQC_results(theta), p_target)
 
-# Optimizer
+# Optimizer for update function
 opt = qml.GradientDescentOptimizer(stepsize=0.01)
 
-# Training Function
+# Training Function:
+# Specifically, update and optimize theta, the value we give to our VQC.
 def update(theta, p_target):
     for _ in range(100): 
         theta = opt.step(lambda v: cost(v, p_target), theta)
@@ -48,43 +52,50 @@ def update(theta, p_target):
 # Q-learning parameters
 alpha_values = [0.1]
 gamma_values = [0.9]
-epsilon_values = [0.3]
-epoch_values = [100]
+
+epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
+epsilon_end = 0.10   # Minimum exploration rate
+decay_rate = 0.995   # How fast epsilon decreases
+
+epoch_values = [1000]
 results = []
-mode = "Random"
+mode = "QRL"
 
 for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_values, epsilon_values, epoch_values):
     print(f"Running with alpha={alpha}, gamma={gamma}, epsilon={epsilon}, epochs={epochs}")
 
-    # Initialize Q-values and quantum model parameters
-    theta_train1 = np.random.randn(10) 
-    theta_train2 = np.random.randn(10)  
+    # Trainable parameters, 4 random values to start to be given to the 4 gates of the 2-qubit VQC
+    theta_train1 = np.random.randn(4) 
+    theta_train2 = np.random.randn(4)  
+
+    # Q-Table with values corresponding to each of the 3 states. These are updated over iterations via. Bellman's equation
     train1_Q = [0, 0, 0]
     train2_Q = [0, 0, 0]
-    distances = np.zeros(epochs)
 
-    # Store probabilities for graphs
-    M_loop = np.zeros(epochs)      
-    M_bypass = np.zeros(epochs)    
-    M_outerLoop = np.zeros(epochs) 
-
-    A_loop = np.zeros(epochs)
-    A_bypass = np.zeros(epochs)
-    A_outerLoop = np.zeros(epochs)
-
-    distances = np.zeros(epochs)
-    # Initialize track and trains
+    # Initialize the track and trains
     track = IntermediateTrack()
     train1 = Train(track, start_position=0)
     train2 = Train(track, start_position=7)
 
     previous_distance = calculate_distance(train1, train2, track)
 
+
+    # Arrays to store data to be graphed.
+    distances = np.zeros(epochs)
+    M_loop = np.zeros(epochs)      
+    M_bypass = np.zeros(epochs)    
+    M_outerLoop = np.zeros(epochs) 
+    A_loop = np.zeros(epochs)
+    A_bypass = np.zeros(epochs)
+    A_outerLoop = np.zeros(epochs)
+
+
+    # Training loop
     for i in range(epochs):
-        # print(f"Epoch: {i}")
+        print(f"Epoch: {i}")
 
         # Epsilon-greedy action selection for Train 1
-        # randomly pick choice, unless epsilon is higher, in which case pick what was learned
+        # randomly choose to explore, or to use the Q-table based on epsilon.
         if np.random.rand() < epsilon:
             a_train1 = np.random.randint(3)  # Randomly pick 0, 1, or 2
             a_train2 = np.random.randint(3)
@@ -92,6 +103,7 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             a_train1 = np.argmax(train1_Q)  # Choose best action from Q-table
             a_train2 = np.argmax(train2_Q)
 
+        epsilon = max(epsilon_end, epsilon * decay_rate)
         
         if mode == "QRL":
             current_distance = simulate_train_loop_qrl(train1, train2, track, a_train1, a_train2)
@@ -99,8 +111,6 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             current_distance = simulate_train_loop_random(train1, train2, track, a_train1)
         else:
             current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
-
-        
 
         # Simulate train movement and get reward
         distances[i] = current_distance
@@ -113,8 +123,8 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             train1_reward = -1
             train2_reward = +1
         else:
-            train1_reward = 0
-            train2_reward = 0
+            train1_reward = -1
+            train2_reward = -1
 
         # Update Q-values using Bellman's equation
         train1_Q[a_train1] = train1_Q[a_train1] + alpha * (train1_reward + gamma * max(train1_Q) - train1_Q[a_train1])
@@ -131,9 +141,6 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             p_train1_loop = 1 / 3
             p_train1_bypass = 1 / 3
             p_train1_outerLoop = 1 / 3
-
-        # DEBUG: Print target probabilities for Train 1
-        # print(f"Target probabilities for Train 1,  Loop: {p_train1_loop}, Bypass: {p_train1_bypass}, Outer Loop: {p_train1_outerLoop}")
 
         # Update the quantum model based on the target probabilities
         theta_train1 = update(theta_train1, [p_train1_loop, p_train1_bypass, p_train1_outerLoop])
