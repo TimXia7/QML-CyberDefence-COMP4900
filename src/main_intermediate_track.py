@@ -57,7 +57,7 @@ epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.10   # Minimum exploration rate
 decay_rate = 0.99   # How fast epsilon decreases
 
-epoch_values = [200]
+epoch_values = [25]
 results = []
 mode = "QRL"
 
@@ -156,9 +156,9 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 
             total_q2 = sum(train2_Q)
             if total_q != 0:
-                p_train2_loop = train1_Q[0] / total_q
-                p_train2_bypass = train1_Q[1] / total_q
-                p_train2_outerLoop = train1_Q[2] / total_q
+                p_train2_loop = train2_Q[0] / total_q
+                p_train2_bypass = train2_Q[1] / total_q
+                p_train2_outerLoop = train2_Q[2] / total_q
             else:
                 p_train2_loop = 1 / 3
                 p_train2_bypass = 1 / 3
@@ -178,14 +178,23 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
         'mean_distance': np.mean(distances),
         'final_probability_train1_loop': M_loop[-1],
         'mean_probability_train1_loop': np.mean(M_loop),
+        'final_probability_train1_bypass': M_bypass[-1],
+        'mean_probability_train1_bypass': np.mean(M_bypass),
+        'final_probability_train1_outerLoop': M_outerLoop[-1],
+        'mean_probability_train1_outerLoop': np.mean(M_outerLoop),
         'final_probability_train2_loop': A_loop[-1],
         'mean_probability_train2_loop': np.mean(A_loop),
+        'final_probability_train2_bypass': A_bypass[-1],
+        'mean_probability_train2_bypass': np.mean(A_bypass),
+        'final_probability_train2_outerLoop': A_outerLoop[-1],
+        'mean_probability_train2_outerLoop': np.mean(A_outerLoop),
     })
+
 
 
 df = pd.DataFrame(results)
 df.to_csv("q_learning_results.csv", index=False)
-print("Results saved to q_learning_results.csv")
+print("Results saved to q_learning_results_test.csv")
 print(df)
 
 plt.figure(figsize=(10, 6))
@@ -200,7 +209,7 @@ plt.xlabel('Epochs')
 plt.ylabel('Probability')
 plt.legend()
 plt.grid(True)
-plt.savefig('loop_probability_plot.png')
+plt.savefig('loop_probability_plot_test_2.png')
 
 plt.figure(figsize=(10, 6))
 
@@ -218,5 +227,5 @@ plt.legend()
 plt.grid(True)
 
 
-plt.savefig('distance_plot_best_model_control_test.png')
+plt.savefig('distance_plot_best_model_control_test_2.png')
 plt.show()

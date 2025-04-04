@@ -51,7 +51,7 @@ epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.075   # Minimum exploration rate
 decay_rate = 0.98   # How fast epsilon decreases
 
-epoch_values = [300]
+epoch_values = [25]
 results = []
 mode = "Fixed"
 
@@ -164,7 +164,7 @@ plt.xlabel('Epochs')
 plt.ylabel('Probability')
 plt.legend(loc='upper right')
 plt.grid(True)
-plt.savefig('loop_probability_plot_M_M1_best_model_control_test.png')
+plt.savefig('loop_probability_plot_M_M1_best_model_control_test_2.png')
 plt.show()
 
 
@@ -185,7 +185,7 @@ plt.legend()
 plt.grid(True)
 
 
-plt.savefig('distance_plot_best_model_control_test.png')
+plt.savefig('distance_plot_best_model_control_test_2.png')
 plt.show()
 
 df = pd.DataFrame(results)
@@ -195,6 +195,6 @@ df.to_csv("q_learning_results_simple_best_model_control_test.csv", index=False)
 plt.figure(figsize=(10, 6))
 
 df.to_csv("q_learning_results.csv", index=False)
-print("Results saved to q_learning_results.csv")
+print("Results saved to q_learning_results_test_2.csv")
 print(df)
 
