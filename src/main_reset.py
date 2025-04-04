@@ -51,7 +51,7 @@ epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.075   # Minimum exploration rate
 decay_rate = 0.98   # How fast epsilon decreases
 
-epoch_values = [300]
+epoch_values = [200]
 results = []
 mode = "Fixed"
 

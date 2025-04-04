@@ -17,7 +17,7 @@ def simulate_train_loop_control_fixed(train1, train2, track):
     return calculate_distance(train1, train2, track)
 
 # Simulation parameters
-epochs = 3000
+epochs = 1000
 track = SimpleTrack()
 train1 = Train(track, start_position=0)
 train2 = Train(track, start_position=7)
@@ -27,8 +27,8 @@ distances = np.zeros(epochs)
 # Run the simulation for 300 epochs
 for i in range(epochs):
     distances[i] = simulate_train_loop_control_fixed(train1, train2, track)
-    train1.set_position(0)
-    train2.set_position(7)
+    # train1.set_position(0)
+    # train2.set_position(7)
 
 # Save results to graph
 results = []
