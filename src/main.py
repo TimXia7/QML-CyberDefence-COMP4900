@@ -43,16 +43,17 @@ def update(theta, p):
     return theta
 
 # Q-learning parameters
+# Q-learning parameters
 alpha_values = [0.01]
 gamma_values = [0.99]
 
 epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.10   # Minimum exploration rate
-decay_rate = 0.995   # How fast epsilon decreases
+decay_rate = 0.9   # How fast epsilon decreases
 
 epoch_values = [100]
 results = []
-mode = "QRL"
+mode = "Random"
 
 # Sweep through all combinations of parameters
 for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_values, epsilon_values, epoch_values):
@@ -68,16 +69,11 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
     distances = np.zeros(epochs)
 
     # Initialize the track and trains
-    track = AdvancedTrack()
+    track = IntermediateTrack()
     train1 = Train(track, start_position=0)
     train2 = Train(track, start_position=7)
 
     previous_distance = calculate_distance(train1, train2, track)
-
-    # Arrays to store data to be graphed.
-    distances = np.zeros(epochs)
-    M = np.zeros(epochs)       
-    A = np.zeros(epochs)
 
 
     for i in range(epochs):
@@ -97,10 +93,10 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             current_distance = simulate_train_loop_qrl(train1, train2, track, a_train1, a_train2)
         
         elif mode == "Random":
-            current_distance = simulate_train_loop_random(train1, train2, track, take_bypass_train1)
+            current_distance = simulate_train_loop_random(train1, train2, track, a_train1)
 
         else:
-            current_distance = simulate_train_loop_predictable(train1, train2, track, take_bypass_train1)
+            current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
         
         distances[i] = current_distance
 
@@ -153,15 +149,6 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
         'final_probability_train2_loop': A[-1],
         'mean_probability_train2_loop': np.mean(A),
     })
-
-
-df = pd.DataFrame(results)
-df.to_csv("q_learning_results_simple.csv", index=False)
-print("Results saved to q_learning_results.csv")
-
-
-plt.figure(figsize=(10, 6))
-
 # Plotting the probabilities for M and M-1
 plt.plot(range(epochs), M, label="Train 1 - Loop Probability (M)", linestyle='-', marker='o', markersize=4, alpha=0.7)
 plt.plot(range(epochs), 1 - M, label="Train 1 - Bypass Probability (1 - M)", linestyle='--', marker='x', markersize=4, alpha=0.7)
@@ -171,21 +158,36 @@ plt.xlabel('Epochs')
 plt.ylabel('Probability')
 plt.legend(loc='upper right')
 plt.grid(True)
-plt.savefig('loop_probability_plot_M_M1.png')
+plt.savefig('loop_probability_plot_M_M1_best_model_control_test.png')
 plt.show()
 
 
 
 plt.figure(figsize=(10, 6))
+
 plt.plot(range(epochs), distances, label='Distance', color='blue', alpha=0.6)
-window = 10
-avg_distances = np.convolve(distances, np.ones(window)/window, mode='valid')
-plt.plot(range(window - 1, epochs), avg_distances, label='Average Distance', color='red', linestyle='--')
-plt.title('Distance Over Epochs')
+
+# Calculate and plot the average line
+average_distance = np.mean(distances)
+plt.axhline(y=average_distance, color='red', linestyle='--', label='Average Distance')
+
+# Add title and labels
+plt.title('Distance and Average Distance Over Epochs')
 plt.xlabel('Epochs')
 plt.ylabel('Distance')
 plt.legend()
 plt.grid(True)
-plt.savefig('distance_plot.png')
+
+
+plt.savefig('distance_plot_best_model_control_test.png')
 plt.show()
+
+
+df = pd.DataFrame(results)
+df.to_csv("q_learning_results_simple_best_model_control_test.csv", index=False)
+
+
+plt.figure(figsize=(10, 6))
+
+
 
