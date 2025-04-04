@@ -141,7 +141,7 @@ def simulate_train_loop_random(train1, train2, track, takeAlternateRoute):
     
     while True:
         train1.move(takeAlternateRoute)
-        train2.move(random.randint(0, 2))
+        train2.move(random.randint(0, 1))
 
         if train1.current_node.position == start_position:
             break
@@ -166,8 +166,8 @@ def simulate_train_loop_control(train1, train2, track, takeAlternateRoute):
     start_position = train1.current_node.position
 
     while True:
-        train1.move(random.randint(0, 2))
-        train2.move(random.randint(0, 2))
+        train1.move(random.randint(0, 1))
+        train2.move(random.randint(0, 1))
 
         if train1.current_node.position == start_position:
             break

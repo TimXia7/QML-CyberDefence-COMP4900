@@ -51,9 +51,9 @@ epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.10   # Minimum exploration rate
 decay_rate = 0.9   # How fast epsilon decreases
 
-epoch_values = [100]
+epoch_values = [300]
 results = []
-mode = "Random"
+mode = "QRL"
 
 # Sweep through all combinations of parameters
 for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_values, epsilon_values, epoch_values):
@@ -69,7 +69,7 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
     distances = np.zeros(epochs)
 
     # Initialize the track and trains
-    track = IntermediateTrack()
+    track = SimpleTrack()
     train1 = Train(track, start_position=0)
     train2 = Train(track, start_position=7)
 
@@ -96,7 +96,7 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             current_distance = simulate_train_loop_random(train1, train2, track, a_train1)
 
         else:
-            current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
+            current_distance = simulate_train_loop_control(train1, train2, track, a_train1)
         
         distances[i] = current_distance
 
@@ -158,7 +158,7 @@ plt.xlabel('Epochs')
 plt.ylabel('Probability')
 plt.legend(loc='upper right')
 plt.grid(True)
-plt.savefig('loop_probability_plot_M_M1_best_model_control_test.png')
+plt.savefig('loop_probability_plot_M_M1_best_model__qrl.png')
 plt.show()
 
 
@@ -179,12 +179,12 @@ plt.legend()
 plt.grid(True)
 
 
-plt.savefig('distance_plot_best_model_control_test.png')
+plt.savefig('distance_plot_best_model__qrl.png')
 plt.show()
 
 
 df = pd.DataFrame(results)
-df.to_csv("q_learning_results_simple_best_model_control_test.csv", index=False)
+df.to_csv("q_learning_results_simple_best_model_qrl.csv", index=False)
 
 
 plt.figure(figsize=(10, 6))
