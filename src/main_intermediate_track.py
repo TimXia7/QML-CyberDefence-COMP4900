@@ -55,9 +55,9 @@ gamma_values = [0.99]
 
 epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.10   # Minimum exploration rate
-decay_rate = 0.995   # How fast epsilon decreases
+decay_rate = 0.99   # How fast epsilon decreases
 
-epoch_values = [100]
+epoch_values = [200]
 results = []
 mode = "QRL"
 
@@ -186,7 +186,6 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 df = pd.DataFrame(results)
 df.to_csv("q_learning_results.csv", index=False)
 print("Results saved to q_learning_results.csv")
-
 print(df)
 
 plt.figure(figsize=(10, 6))

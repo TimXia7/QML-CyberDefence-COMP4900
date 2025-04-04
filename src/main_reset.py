@@ -77,11 +77,9 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 
 
     for i in range(epochs):
-        if (mode == "Copycat"):
-            copycat = random.randint(0, 1)
-
         print(f"Epoch: {i}")
         
+        # reset the positions of the trains
         train1.set_position(0)
         train2.set_position(7)
 
@@ -103,9 +101,6 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 
         elif mode == "Fixed":
             current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
-        elif mode == "Copycat":
-            current_distance = simulate_train_loop_copycat(train1, train2, track, a_train1, copycat)
-            copycat = a_train1
         else:
             current_distance = simulate_train_loop_control_fixed(train1, train2, track)
         
