@@ -50,8 +50,8 @@ def update(theta, p_target):
     return theta
  
 # Q-learning parameters
-alpha_values = [0.01,0.1,0.2]
-gamma_values = [0.99,0.95,0.9]
+alpha_values = [0.01]
+gamma_values = [0.99]
 
 epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.10   # Minimum exploration rate
@@ -204,14 +204,20 @@ plt.grid(True)
 plt.savefig('loop_probability_plot.png')
 
 plt.figure(figsize=(10, 6))
+
 plt.plot(range(epochs), distances, label='Distance', color='blue', alpha=0.6)
-window = 10
-avg_distances = np.convolve(distances, np.ones(window)/window, mode='valid')
-plt.plot(range(window - 1, epochs), avg_distances, label='Average Distance', color='red', linestyle='--')
-plt.title('Distance Over Epochs')
+
+# Calculate and plot the average line
+average_distance = np.mean(distances)
+plt.axhline(y=average_distance, color='red', linestyle='--', label='Average Distance')
+
+# Add title and labels
+plt.title('Distance and Average Distance Over Epochs')
 plt.xlabel('Epochs')
 plt.ylabel('Distance')
 plt.legend()
 plt.grid(True)
-plt.savefig('distance_plot.png')
+
+
+plt.savefig('distance_plot_best_model_control_test.png')
 plt.show()
