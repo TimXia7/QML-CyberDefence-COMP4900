@@ -4,12 +4,24 @@ import pandas as pd
 import random
 from train_simulation import *
 
-def simulate_train_loop_copycat_control(train1, train2, track, train_1_choice, copycat):
+def simulate_train_loop_control_fixed(train1, train2, track):
     start_position = train1.current_node.position
-    
+
     while True:
-        train1.move(train_1_choice)
-        train2.move(copycat)
+        train1.move(random.randint(0, 2))
+        train2.move(0)
+
+        if train1.current_node.position == start_position:
+            break
+
+    return calculate_distance(train1, train2, track)
+
+def simulate_train_loop_control_Random(train1, train2, track):
+    start_position = train1.current_node.position
+
+    while True:
+        train1.move(random.randint(0, 2))
+        train2.move(random.randint(0, 2))
 
         if train1.current_node.position == start_position:
             break
@@ -17,21 +29,21 @@ def simulate_train_loop_copycat_control(train1, train2, track, train_1_choice, c
     return calculate_distance(train1, train2, track)
 
 # Simulation parameters
-epochs = 300
+epochs = 100
+mode = "Fixed"
+
 track = SimpleTrack()
 train1 = Train(track, start_position=0)
 train2 = Train(track, start_position=7)
 
 distances = np.zeros(epochs)
-copycat = random.randint(0, 1)
 
 # Run the simulation for 300 epochs
 for i in range(epochs):
-    train_1_choice = random.randint(0, 1)
-    distances[i] = simulate_train_loop_copycat_control(train1, train2, track, train_1_choice, copycat)
-    copycat = train_1_choice
-
-
+    if (mode == "Random"):
+        distances[i] = simulate_train_loop_control_Random(train1, train2, track)
+    else:
+        distances[i] = simulate_train_loop_control_fixed(train1, train2, track)
 
 # Save results to graph
 results = []

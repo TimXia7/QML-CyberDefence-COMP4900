@@ -51,9 +51,9 @@ epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.075   # Minimum exploration rate
 decay_rate = 0.98   # How fast epsilon decreases
 
-epoch_values = [300]
+epoch_values = [100]
 results = []
-mode = "Fixed"
+mode = "QRL"
 
 # Sweep through all combinations of parameters
 for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_values, epsilon_values, epoch_values):
@@ -77,9 +77,6 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 
 
     for i in range(epochs):
-        if (mode == "Copycat"):
-            copycat = random.randint(0, 1)
-
         print(f"Epoch: {i}")
         
         train1.set_position(0)
@@ -92,31 +89,26 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             a_train1 = np.argmax(train1_Q)
             a_train2 = np.argmax(train2_Q)
         
+        # Decay epsilon
         epsilon = max(epsilon_end, epsilon * decay_rate)
 
         # Simulate train movement and get the reward
         if mode == "QRL":
             current_distance = simulate_train_loop_qrl(train1, train2, track, a_train1, a_train2)
-        
         elif mode == "Random":
             current_distance = simulate_train_loop_random(train1, train2, track, a_train1)
-
-        elif mode == "Fixed":
-            current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
-        elif mode == "Copycat":
-            current_distance = simulate_train_loop_copycat(train1, train2, track, a_train1, copycat)
-            copycat = a_train1
         else:
-            current_distance = simulate_train_loop_control_fixed(train1, train2, track)
+            current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
         
+
         distances[i] = current_distance
 
         if current_distance > previous_distance:
             train1_reward = current_distance-previous_distance
-            train2_reward = -1
+            train2_reward = previous_distance-current_distance
         elif current_distance < previous_distance:
             train1_reward = current_distance-previous_distance
-            train2_reward = +1
+            train2_reward = previous_distance-current_distance
         else:
             train1_reward = -1
             train2_reward = -1
@@ -147,6 +139,7 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             # Store probability of choosing loop for plotting
             A[i] = W(theta_train2)[0]
 
+
     # Save results to graph
     results.append({
         'alpha': alpha,
@@ -171,7 +164,6 @@ plt.legend(loc='upper right')
 plt.grid(True)
 plt.savefig('loop_probability_plot_M_M1_best_model_control_test.png')
 plt.show()
-
 
 
 plt.figure(figsize=(10, 6))

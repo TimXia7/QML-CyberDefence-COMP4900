@@ -57,7 +57,7 @@ epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.10   # Minimum exploration rate
 decay_rate = 0.99   # How fast epsilon decreases
 
-epoch_values = [25]
+epoch_values = [100]
 results = []
 mode = "QRL"
 
@@ -65,6 +65,8 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
     print(f"Running with alpha={alpha}, gamma={gamma}, epsilon={epsilon}, epochs={epochs}")
 
     # Trainable parameters, 4 random values to start to be given to the 4 gates of the 2-qubit VQC
+    # Yes, we only have 3 states, but the circuit still requires 4 inputs, 2 RX and RY gates each
+    # We account for only have 3 states when mapping the resulting qubits to a path selection choice
     theta_train1 = np.random.randn(4) 
     theta_train2 = np.random.randn(4)  
 
@@ -117,11 +119,11 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 
         # Determine Reward
         if current_distance > previous_distance:
-            train1_reward = +1
-            train2_reward = -1
+            train1_reward = current_distance - previous_distance
+            train2_reward = previous_distance - current_distance
         elif current_distance < previous_distance:
-            train1_reward = -1
-            train2_reward = +1
+            train1_reward = current_distance - previous_distance
+            train2_reward = previous_distance - current_distance
         else:
             train1_reward = -1
             train2_reward = -1

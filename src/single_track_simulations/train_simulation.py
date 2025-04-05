@@ -129,8 +129,7 @@ def calculate_distance(train1, train2, track):
 
 def simulate_train_loop_predictable(train1, train2, track, takeAlternateRoute):
     start_position = train1.current_node.position
-    print(f"takeAlternateRoute: {takeAlternateRoute}")
-    
+
     while True:
         train1.move(takeAlternateRoute)
         train2.move(0)
@@ -139,20 +138,6 @@ def simulate_train_loop_predictable(train1, train2, track, takeAlternateRoute):
             break
 
     return calculate_distance(train1, train2, track)
-
-def simulate_train_loop_copycat(train1, train2, track, takeAlternateRoute, train_1_last):
-    start_position = train1.current_node.position
-    print(f"takeAlternateRoute: {takeAlternateRoute}")
-    
-    while True:
-        train1.move(takeAlternateRoute)
-        train2.move(train_1_last)
-
-        if train1.current_node.position == start_position:
-            break
-
-    return calculate_distance(train1, train2, track)
-
 
 def simulate_train_loop_random(train1, train2, track, takeAlternateRoute):
     start_position = train1.current_node.position
@@ -180,7 +165,7 @@ def simulate_train_loop_qrl(train1, train2, track, takeAlternateRoute_agent, tak
     return calculate_distance(train1, train2, track)
 
 
-def simulate_train_loop_control(train1, train2, track):
+def simulate_train_loop_control_random(train1, train2, track):
     start_position = train1.current_node.position
 
     while True:

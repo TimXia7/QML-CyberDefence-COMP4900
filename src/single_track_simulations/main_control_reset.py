@@ -16,8 +16,22 @@ def simulate_train_loop_control_fixed(train1, train2, track):
 
     return calculate_distance(train1, train2, track)
 
+def simulate_train_loop_control_Random(train1, train2, track):
+    start_position = train1.current_node.position
+
+    while True:
+        train1.move(random.randint(0, 1))
+        train2.move(random.randint(0, 1))
+
+        if train1.current_node.position == start_position:
+            break
+
+    return calculate_distance(train1, train2, track)
+
 # Simulation parameters
-epochs = 3000
+epochs = 100
+mode = "Random"
+
 track = SimpleTrack()
 train1 = Train(track, start_position=0)
 train2 = Train(track, start_position=7)
@@ -26,7 +40,12 @@ distances = np.zeros(epochs)
 
 # Run the simulation for 300 epochs
 for i in range(epochs):
-    distances[i] = simulate_train_loop_control_fixed(train1, train2, track)
+    if (mode == "Random"):
+        distances[i] = simulate_train_loop_control_Random(train1, train2, track)
+    else:
+        distances[i] = simulate_train_loop_control_fixed(train1, train2, track)
+        
+    # Reset position after epoch
     train1.set_position(0)
     train2.set_position(7)
 

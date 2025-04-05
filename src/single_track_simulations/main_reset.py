@@ -51,7 +51,7 @@ epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.075   # Minimum exploration rate
 decay_rate = 0.98   # How fast epsilon decreases
 
-epoch_values = [25]
+epoch_values = [100]
 results = []
 mode = "Fixed"
 
@@ -95,14 +95,11 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
         # Simulate train movement and get the reward
         if mode == "QRL":
             current_distance = simulate_train_loop_qrl(train1, train2, track, a_train1, a_train2)
-        
         elif mode == "Random":
             current_distance = simulate_train_loop_random(train1, train2, track, a_train1)
-
-        elif mode == "Fixed":
-            current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
         else:
-            current_distance = simulate_train_loop_control_fixed(train1, train2, track)
+            current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
+
         
         distances[i] = current_distance
 
