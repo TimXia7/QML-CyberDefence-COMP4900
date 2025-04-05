@@ -44,16 +44,16 @@ def update(theta, p):
 
 # Q-learning parameters
 # Q-learning parameters
-alpha_values = [0.01]
+alpha_values = [0.1]
 gamma_values = [0.99]
 
 epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
-epsilon_end = 0.10   # Minimum exploration rate
-decay_rate = 0.9   # How fast epsilon decreases
+epsilon_end = 0.075   # Minimum exploration rate
+decay_rate = 0.98   # How fast epsilon decreases
 
 epoch_values = [100]
 results = []
-mode = "Random"
+mode = "QRL"
 
 # Sweep through all combinations of parameters
 for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_values, epsilon_values, epoch_values):
@@ -69,7 +69,7 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
     distances = np.zeros(epochs)
 
     # Initialize the track and trains
-    track = IntermediateTrack()
+    track = SimpleTrack()
     train1 = Train(track, start_position=0)
     train2 = Train(track, start_position=7)
 
@@ -78,6 +78,9 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 
     for i in range(epochs):
         print(f"Epoch: {i}")
+        
+        train1.set_position(0)
+        train2.set_position(7)
 
         if np.random.rand() < epsilon:
             a_train1 = np.random.randint(2)
@@ -86,26 +89,26 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             a_train1 = np.argmax(train1_Q)
             a_train2 = np.argmax(train2_Q)
         
+        # Decay epsilon
         epsilon = max(epsilon_end, epsilon * decay_rate)
 
         # Simulate train movement and get the reward
         if mode == "QRL":
             current_distance = simulate_train_loop_qrl(train1, train2, track, a_train1, a_train2)
-        
         elif mode == "Random":
             current_distance = simulate_train_loop_random(train1, train2, track, a_train1)
-
         else:
             current_distance = simulate_train_loop_predictable(train1, train2, track, a_train1)
         
+
         distances[i] = current_distance
 
         if current_distance > previous_distance:
-            train1_reward = +1
-            train2_reward = -1
+            train1_reward = current_distance-previous_distance
+            train2_reward = previous_distance-current_distance
         elif current_distance < previous_distance:
-            train1_reward = -1
-            train2_reward = +1
+            train1_reward = current_distance-previous_distance
+            train2_reward = previous_distance-current_distance
         else:
             train1_reward = -1
             train2_reward = -1
@@ -136,6 +139,7 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             # Store probability of choosing loop for plotting
             A[i] = W(theta_train2)[0]
 
+
     # Save results to graph
     results.append({
         'alpha': alpha,
@@ -162,7 +166,6 @@ plt.savefig('loop_probability_plot_M_M1_best_model_control_test.png')
 plt.show()
 
 
-
 plt.figure(figsize=(10, 6))
 
 plt.plot(range(epochs), distances, label='Distance', color='blue', alpha=0.6)
@@ -182,12 +185,13 @@ plt.grid(True)
 plt.savefig('distance_plot_best_model_control_test.png')
 plt.show()
 
-
 df = pd.DataFrame(results)
 df.to_csv("q_learning_results_simple_best_model_control_test.csv", index=False)
 
 
 plt.figure(figsize=(10, 6))
 
-
+df.to_csv("q_learning_results.csv", index=False)
+print("Results saved to q_learning_results.csv")
+print(df)
 

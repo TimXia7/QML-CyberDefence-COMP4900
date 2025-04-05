@@ -97,6 +97,10 @@ class Train:
         else:
             self.current_node = self.current_node.next
 
+    # Set the train's position to a specific node
+    def set_position(self, position):
+        self.current_node = self.track.nodes[position]
+
 
 def calculate_distance(train1, train2, track):
     # BFS for shortest path calculation
@@ -125,23 +129,22 @@ def calculate_distance(train1, train2, track):
 
 def simulate_train_loop_predictable(train1, train2, track, takeAlternateRoute):
     start_position = train1.current_node.position
-    
+
     while True:
         train1.move(takeAlternateRoute)
-        train2.move(1)
+        train2.move(0)
 
         if train1.current_node.position == start_position:
             break
 
     return calculate_distance(train1, train2, track)
 
-
 def simulate_train_loop_random(train1, train2, track, takeAlternateRoute):
     start_position = train1.current_node.position
     
     while True:
         train1.move(takeAlternateRoute)
-        train2.move(random.randint(0, 2))
+        train2.move(random.randint(0, 1))
 
         if train1.current_node.position == start_position:
             break
@@ -162,12 +165,24 @@ def simulate_train_loop_qrl(train1, train2, track, takeAlternateRoute_agent, tak
     return calculate_distance(train1, train2, track)
 
 
-def simulate_train_loop_control(train1, train2, track, takeAlternateRoute):
+def simulate_train_loop_control_random(train1, train2, track):
     start_position = train1.current_node.position
 
     while True:
-        train1.move(random.randint(0, 2))
-        train2.move(random.randint(0, 2))
+        train1.move(random.randint(0, 1))
+        train2.move(random.randint(0, 1))
+
+        if train1.current_node.position == start_position:
+            break
+
+    return calculate_distance(train1, train2, track)
+
+def simulate_train_loop_control_fixed(train1, train2, track):
+    start_position = train1.current_node.position
+
+    while True:
+        train1.move(random.randint(0, 1))
+        train2.move(0)
 
         if train1.current_node.position == start_position:
             break

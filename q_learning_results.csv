@@ -1,0 +1,2 @@
+alpha,gamma,epsilon,epochs,final_distance,mean_distance,final_probability_train1_loop,mean_probability_train1_loop,final_probability_train1_bypass,mean_probability_train1_bypass,final_probability_train1_outerLoop,mean_probability_train1_outerLoop,final_probability_train2_loop,mean_probability_train2_loop,final_probability_train2_bypass,mean_probability_train2_bypass,final_probability_train2_outerLoop,mean_probability_train2_outerLoop
+0.01,0.99,0.36603234127322926,100,1.0,3.62,0.218,0.24802,0.116,0.13917000000000002,0.6659999999999999,0.61281,0.0,0.0,0.0,0.0,0.0,0.0
