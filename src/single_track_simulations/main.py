@@ -111,7 +111,7 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             train2_reward = previous_distance-current_distance
         else:
             train1_reward = -1
-            train2_reward = -1
+            train2_reward = +1
 
         # Update Q-values using Bellman equation
         train1_Q[a_train1] = train1_Q[a_train1] + alpha * (train1_reward + gamma * max(train1_Q) - train1_Q[a_train1])

@@ -29,7 +29,7 @@ def simulate_train_loop_control_Random(train1, train2, track):
     return calculate_distance(train1, train2, track)
 
 # Simulation parameters
-epochs = 100
+epochs = 200
 mode = "Random"
 
 track = SimpleTrack()

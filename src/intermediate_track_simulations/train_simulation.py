@@ -188,3 +188,12 @@ def simulate_train_loop_control_fixed(train1, train2, track):
             break
 
     return calculate_distance(train1, train2, track)
+
+
+track = SimpleTrack()
+train1 = Train(track, start_position=0)
+train2 = Train(track, start_position=7)
+
+simulate_train_loop_qrl(train1, train2, track, 1, 0)
+
+print(f"distance: {calculate_distance(train1, train2, track)}")

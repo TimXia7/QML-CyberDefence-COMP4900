@@ -43,17 +43,20 @@ def update(theta, p):
     return theta
 
 # Q-learning parameters
-# Q-learning parameters
-alpha_values = [0.1]
-gamma_values = [0.99]
+
+# how much new information overrides old information in the Q-table. (how willing the system is to change policy)
+alpha_values = [0.1] # 0.1, 0.05, 0.01
+
+# long vs. short term rewards
+gamma_values = [0.99] # 0.99, 0.95, 0.9
 
 epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.075   # Minimum exploration rate
 decay_rate = 0.98   # How fast epsilon decreases
 
-epoch_values = [100]
+epoch_values = [200]
 results = []
-mode = "Fixed"
+mode = "QRL"
 
 # Sweep through all combinations of parameters
 for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_values, epsilon_values, epoch_values):
@@ -105,13 +108,13 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
 
         if current_distance > previous_distance:
             train1_reward = current_distance-previous_distance
-            train2_reward = -1
+            train2_reward = previous_distance-current_distance
         elif current_distance < previous_distance:
             train1_reward = current_distance-previous_distance
-            train2_reward = +1
+            train2_reward = previous_distance-current_distance
         else:
             train1_reward = -1
-            train2_reward = -1
+            train2_reward = +1
 
         # Update Q-values using Bellman equation
         train1_Q[a_train1] = train1_Q[a_train1] + alpha * (train1_reward + gamma * max(train1_Q) - train1_Q[a_train1])
