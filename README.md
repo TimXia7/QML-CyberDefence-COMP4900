@@ -1,27 +1,26 @@
 # QML-CyberDefence-COMP4900
 
+All the details about the code and various scenarios described below can be found in the report: https://github.com/TimXia7/QML-CyberDefence-COMP4900/blob/main/Final%20Report.pdf
+
 # Virtual Env Setup
 1. In Command Prompt, navigate to the root directory of the project folder, and run these commands, one at a time:
 
 ```
 pip install virtualenv
 python -m venv venv
-source venv/bin/activate or .\venv\Scripts\Activate.ps1 for windows
+source venv/bin/activate or .\venv\Scripts\Activate.ps1 for windows 
 pip install -r requirements.txt
 ```
 
-# Running Files (from the base of the project, folder "QML-CyberDefence-COMP4900" )
-1. To run the main sequence/simulation, enter:
+# Running The Various Scenarios For The Simple Track
+1. For the Simple Track scenario where Train 1 and 2 positions reset: python src/single_track_simulations/main_reset.py
+2. For the Simple Track scenario where Train 2 position does not reset: python src/single_track_simulations/main.py
+3.  For the Simple Track control scenario where Train 1 and 2 positions reset: python src/single_track_simulations/main_control_reset.py
+4.   For the Simple Track control scenario Where Train 1 and 2 positions do not reset: python src/single_track_simulations/main_control.py
 
-    python .\src\QML.py
-
-As of 2024-03-02, it is not complete, and just outputs a test value.
-
-
-2. To run all automated tests, use:
-
-    python -m unittest discover unit_tests
-
-To run a specific test, use  (replace, "test_variational_circuit.py"  with the unit test file):
-
-    python .\unit_tests\test_variational_circuit.py
+# Running The Various Scenarios For The Intermediate Track
+1. For the Intermediate Track scenario where Train 1 and 2 positions reset: python src/intermediate_track_simulations/main_intermediate_track_reset.py
+2. For the Intermediate Track scenario where Train 2 position does not reset: python src/intermediate_track_simulations/main_intermediate_track.py
+3.  For the Intermediate Track control scenario where Train 1 and 2 positions reset: python src/intermediate_track_simulations/main_intermediate_track_reset_control.py
+4.   For the Intermediate Track control scenario Where Train 1 and 2 positions do not reset: python src/intermediate_track_simulations/main_intermediate_track_control.py
+    
