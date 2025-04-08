@@ -57,9 +57,9 @@ epsilon_values = [1.0] # Epsilon starts at 1.0, decays overtime
 epsilon_end = 0.10   # Minimum exploration rate
 decay_rate = 0.99   # How fast epsilon decreases
 
-epoch_values = [100]
+epoch_values = [200]
 results = []
-mode = "Random"
+mode = "QRL"
 
 for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_values, epsilon_values, epoch_values):
     print(f"Running with alpha={alpha}, gamma={gamma}, epsilon={epsilon}, epochs={epochs}")
@@ -130,7 +130,7 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             train2_reward = previous_distance - current_distance
         else:
             train1_reward = -1
-            train2_reward = -1
+            train2_reward = +1
 
         # Update Q-values using Bellman's equation
         train1_Q[a_train1] = train1_Q[a_train1] + alpha * (train1_reward + gamma * max(train1_Q) - train1_Q[a_train1])
@@ -173,6 +173,8 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             theta_train2 = update(theta_train2, [p_train1_loop, p_train1_bypass, p_train1_outerLoop])
             action_probs2 = map_VQC_results(theta_train2)
             A_loop[i], A_bypass[i], A_outerLoop[i] = action_probs2
+
+            previous_distance = current_distance
 
     # Save results to graph
     results.append({
