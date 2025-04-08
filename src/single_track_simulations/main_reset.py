@@ -142,6 +142,8 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             # Store probability of choosing loop for plotting
             A[i] = W(theta_train2)[0]
 
+            previous_distance = current_distance
+
     # Save results to graph
     results.append({
         'alpha': alpha,

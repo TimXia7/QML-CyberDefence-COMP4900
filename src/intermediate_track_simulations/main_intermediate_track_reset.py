@@ -174,6 +174,8 @@ for alpha, gamma, epsilon, epochs in itertools.product(alpha_values, gamma_value
             action_probs2 = map_VQC_results(theta_train2)
             A_loop[i], A_bypass[i], A_outerLoop[i] = action_probs2
 
+            previous_distance = current_distance
+
     # Save results to graph
     results.append({
         'alpha': alpha,
